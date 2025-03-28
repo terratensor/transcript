@@ -10,12 +10,16 @@
 /home/audetv/projects/transcript/
 ├── pyakin/
 │ ├── txt/ # Исходные текстовые файлы
-│ ├── cleaned_corpus.txt # Результат (текст с переносами строк)
-│ └── cleaned_corpus_single_line.txt # Результат (текст в одну строку)
+│ ├── cleaned_corpus.txt # Результат (оригинальный регистр)
+│ ├── cleaned_corpus_uncased.txt # Результат (нижний регистр)
+│ ├── cleaned_corpus_single_line.txt # Результат (оригинальный регистр)
+│ └── cleaned_corpus_single_line_uncased.txt # Результат (нижний регистр)
 ├── zaznobin/
 │ ├── txt/ # Исходные текстовые файлы
-│ ├── cleaned_corpus.txt # Результат (текст с переносами строк)
-│ └── cleaned_corpus_single_line.txt # Результат (текст в одну строку)
+│ ├── cleaned_corpus.txt # Результат (оригинальный регистр)
+│ ├── cleaned_corpus_uncased.txt # Результат (нижний регистр)
+│ ├── cleaned_corpus_single_line.txt # Результат (оригинальный регистр)
+│ └── cleaned_corpus_single_line_uncased.txt # Результат (нижний регистр)
 ├── cleaner/ # Папка с программой
 │ ├── main.go # Основной файл программы
 │ └── README.md # Инструкция по запуску
@@ -30,14 +34,20 @@ cd /home/audetv/projects/transcript/cleaner
 ```
 3. Запустите программу:
 ```bash
+# Сохранить текст с оригинальным регистром
 go run main.go
+
+# Привести весь текст к нижнему регистру
+go run main.go -uncased
 ```
 
-4. После завершения работы программы:
-- В папке `pyakin` будут созданы файлы:
-- `cleaned_corpus.txt` (текст с переносами строк).
-- `cleaned_corpus_single_line.txt` (текст в одну строку).
-- В папке `zaznobin` будут созданы аналогичные файлы.
+4. После завершения работы программы будут созданы файлы:
+- В режиме по умолчанию:
+- `cleaned_corpus.txt`
+- `cleaned_corpus_single_line.txt`
+- В режиме `-uncased`:
+- `cleaned_corpus_uncased.txt`
+- `cleaned_corpus_single_line_uncased.txt`
 
 ## Пример работы
 
@@ -51,42 +61,23 @@ go run main.go
 [музыка] лес Харит гибриды
 ```
 
-### Результат:
-1. Файл `cleaned_corpus.txt`:
-```
-и первый Флавий воинственный пружины Крымских посеял
-второй Харитон молодой певец рожденный в рощами
-[музыка] лес Харит гибриды
-```
+### Результаты:
+1. Обычный режим:
+- `cleaned_corpus.txt` - сохраняет оригинальный регистр
+- `cleaned_corpus_single_line.txt` - сохраняет оригинальный регистр
 
-2. Файл `cleaned_corpus_single_line.txt`:
-```
-и первый Флавий воинственный пружины Крымских посеял второй Харитон молодой певец рожденный в рощами [музыка] лес Харит гибриды
-```
+2. Режим `-uncased`:
+- `cleaned_corpus_uncased.txt` - весь текст в нижнем регистре
+- `cleaned_corpus_single_line_uncased.txt` - весь текст в нижнем регистре
+
+## Опции программы
+
+- `-uncased` - при использовании этого флага:
+- Весь текст будет приведен к нижнему регистру
+- В имена выходных файлов будет добавлен суффикс `_uncased`
+- Пример имен файлов: `cleaned_corpus_uncased.txt`
+- По умолчанию (без флага) сохраняется оригинальный регистр текста
 
 ## Лицензия
 
 Этот проект распространяется под лицензией MIT.
-```
-
----
-
-### Как использовать
-
-1. Убедитесь, что исходные текстовые файлы находятся в папках:
-- `pyakin/txt`
-- `zaznobin/txt`
-
-2. Перейдите в папку с программой:
-```bash
-cd /home/audetv/projects/transcript/cleaner
-```
-
-3. Запустите программу:
-```bash
-go run main.go
-```
-
-4. Результаты будут сохранены в папках:
-- `pyakin`
-- `zaznobin`
