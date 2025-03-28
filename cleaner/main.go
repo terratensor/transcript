@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -10,6 +11,10 @@ import (
 )
 
 func main() {
+	// Флаг для определения, нужно ли приводить текст к нижнему регистру
+	uncased := flag.Bool("uncased", false, "привести весь текст к нижнему регистру")
+	flag.Parse()
+
 	// Папки для обработки (относительные пути от папки проекта)
 	folders := []string{
 		"../pyakin/txt",
@@ -18,25 +23,34 @@ func main() {
 
 	// Обработка каждой папки
 	for _, folder := range folders {
-		processFolder(folder)
+		processFolder(folder, *uncased)
 	}
 
 	fmt.Println("Обработка завершена.")
 }
 
-func processFolder(folderPath string) {
+func processFolder(folderPath string, uncased bool) {
 	// Определяем папку для сохранения результатов
 	outputFolder := filepath.Dir(folderPath)
 
+	// Формируем имена файлов в зависимости от режима
+	outputWithNewlines := "cleaned_corpus.txt"
+	outputSingleLine := "cleaned_corpus_single_line.txt"
+
+	if uncased {
+		outputWithNewlines = "cleaned_corpus_uncased.txt"
+		outputSingleLine = "cleaned_corpus_single_line_uncased.txt"
+	}
+
 	// Создаем файлы для сохранения очищенного корпуса
-	outputFileWithNewlines, err := os.Create(filepath.Join(outputFolder, "cleaned_corpus.txt"))
+	outputFileWithNewlines, err := os.Create(filepath.Join(outputFolder, outputWithNewlines))
 	if err != nil {
 		fmt.Println("Ошибка при создании файла:", err)
 		return
 	}
 	defer outputFileWithNewlines.Close()
 
-	outputFileSingleLine, err := os.Create(filepath.Join(outputFolder, "cleaned_corpus_single_line.txt"))
+	outputFileSingleLine, err := os.Create(filepath.Join(outputFolder, outputSingleLine))
 	if err != nil {
 		fmt.Println("Ошибка при создании файла:", err)
 		return
@@ -57,14 +71,14 @@ func processFolder(folderPath string) {
 	for _, file := range files {
 		if !file.IsDir() && strings.HasSuffix(file.Name(), ".txt") {
 			filePath := filepath.Join(folderPath, file.Name())
-			processFile(filePath, outputFileWithNewlines, outputFileSingleLine, timeRegex)
+			processFile(filePath, outputFileWithNewlines, outputFileSingleLine, timeRegex, uncased)
 		}
 	}
 
 	fmt.Printf("Обработка папки %s завершена.\n", folderPath)
 }
 
-func processFile(filePath string, outputFileWithNewlines, outputFileSingleLine *os.File, timeRegex *regexp.Regexp) {
+func processFile(filePath string, outputFileWithNewlines, outputFileSingleLine *os.File, timeRegex *regexp.Regexp, uncased bool) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		fmt.Println("Ошибка при открытии файла:", err)
@@ -78,6 +92,11 @@ func processFile(filePath string, outputFileWithNewlines, outputFileSingleLine *
 
 		// Если строка не соответствует формату времени, обрабатываем её
 		if !timeRegex.MatchString(line) {
+			// Приведение к нижнему регистру, если нужно
+			if uncased {
+				line = strings.ToLower(line)
+			}
+
 			// Запись в файл с переносами строк
 			_, err := outputFileWithNewlines.WriteString(line + "\n")
 			if err != nil {
